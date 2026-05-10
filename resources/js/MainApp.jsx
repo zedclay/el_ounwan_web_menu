@@ -271,7 +271,7 @@ function MenuRow({ item }) {
             <motion.div
                 whileHover={{ y: -2 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                className="flex items-center gap-4 p-4 rounded-2xl glass-chip glass-liquid transition-all group"
+                className="flex items-start sm:items-center gap-3 sm:gap-4 p-4 rounded-2xl glass-chip glass-liquid transition-all group"
             >
                 {item.imageUrl ? (
                     <SmartImage
@@ -288,14 +288,19 @@ function MenuRow({ item }) {
                 )}
 
                 <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-3">
-                        <h4 className="min-w-0 truncate font-bold text-on-surface">{item.name}</h4>
-                        <span className="hidden sm:block flex-1 border-b border-dotted border-outline-variant/60 translate-y-[2px]" />
-                        <span className="font-bold text-primary tabular-nums">{item.price}</span>
+                    <div className="flex items-start sm:items-center justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                            <h4 className="min-w-0 font-bold text-on-surface break-words sm:truncate">
+                                {item.name}
+                            </h4>
+                            {item.description ? (
+                                <div className="mt-1 text-sm text-on-surface-variant leading-snug">{item.description}</div>
+                            ) : null}
+                        </div>
+                        <div className="shrink-0 text-right">
+                            <span className="font-bold text-primary tabular-nums">{item.price}</span>
+                        </div>
                     </div>
-                    {item.description ? (
-                        <div className="mt-1 text-sm text-on-surface-variant leading-snug">{item.description}</div>
-                    ) : null}
                 </div>
             </motion.div>
         </Tilt>
@@ -421,25 +426,8 @@ export default function MainApp() {
     useEffect(() => {
         const ids = (menu?.categories ?? []).map((c) => c.id).filter(Boolean);
         if (!ids.length) return;
-
         if (!ids.includes(activeCategory)) setActiveCategory(ids[0]);
-
-        const elements = ids.map((id) => document.getElementById(id)).filter(Boolean);
-        if (!elements.length) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                const visible = entries
-                    .filter((e) => e.isIntersecting)
-                    .sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0));
-                if (visible[0]?.target?.id) setActiveCategory(visible[0].target.id);
-            },
-            { rootMargin: '-25% 0px -60% 0px', threshold: [0.08, 0.2, 0.35] },
-        );
-
-        for (const el of elements) observer.observe(el);
-        return () => observer.disconnect();
-    }, [menu, activeCategory]);
+    }, [activeCategory, menu]);
 
     const categories = useMemo(() => {
         return menu?.categories ?? [];
@@ -465,6 +453,21 @@ export default function MainApp() {
             { id: 'eatery', label: 'Eatery • المأكولات' },
         ];
     }, [categories]);
+
+    const categoriesForTabs = useMemo(() => {
+        if (loading) return categoriesForRender;
+        return categoriesForRender.filter((c) => (categoryById.get(c.id)?.items ?? []).length > 0);
+    }, [categoriesForRender, categoryById, loading]);
+
+    const activeCategoryData = useMemo(() => {
+        return categoryById.get(activeCategory) ?? categoriesForTabs[0] ?? null;
+    }, [activeCategory, categoryById, categoriesForTabs]);
+
+    useEffect(() => {
+        const ids = categoriesForTabs.map((c) => c.id).filter(Boolean);
+        if (!ids.length) return;
+        if (!ids.includes(activeCategory)) setActiveCategory(ids[0]);
+    }, [activeCategory, categoriesForTabs]);
 
     const categoryIcons = useMemo(
         () => ({
@@ -548,7 +551,10 @@ export default function MainApp() {
     );
 
     return (
-        <div dir="rtl" className="font-body-md text-body-md overflow-x-hidden pb-20 md:pb-0 bg-background text-on-background">
+        <div
+            dir="rtl"
+            className="font-body-md text-body-md overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0 bg-background text-on-background"
+        >
             <motion.div
                 className="fixed top-0 left-0 right-0 h-[3px] z-[70] origin-left"
                 style={{
@@ -577,7 +583,7 @@ export default function MainApp() {
                 </div>
             </header>
 
-            <main className="space-y-14 md:space-y-20">
+            <main className="space-y-10 md:space-y-16">
                 <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto pt-6 md:pt-8">
                     <TopSlider
                         reduceMotion={reduceMotion}
@@ -589,23 +595,25 @@ export default function MainApp() {
                 </section>
 
             <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto" id="highlights">
-                <Reveal>
-                    <div className="flex items-end justify-between gap-6">
-                        <div>
-                            <div className="font-label-sm text-label-sm text-on-surface-variant">Featured</div>
-                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Moments at el ounwan</h2>
+                <div className="px-2 md:px-0">
+                    <Reveal>
+                        <div className="flex items-end justify-between gap-6">
+                            <div>
+                                <div className="font-label-sm text-label-sm text-on-surface-variant">Featured</div>
+                                <h2 className="font-headline-lg text-headline-lg text-on-surface">Moments at el ounwan</h2>
+                            </div>
+                            <div className="hidden md:flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
+                                <span className="material-symbols-outlined text-[18px]">swipe</span>
+                                Swipe
+                            </div>
                         </div>
-                        <div className="hidden md:flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
-                            <span className="material-symbols-outlined text-[18px]">swipe</span>
-                            Swipe
-                        </div>
-                    </div>
-                </Reveal>
-                <div className="mt-6 flex gap-4 overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory">
+                    </Reveal>
+                </div>
+                <div className="mt-6 flex gap-4 overflow-x-auto no-scrollbar pb-2 snap-x snap-mandatory px-4">
                     {highlights.map((h) => (
                         <motion.div
                             key={h.id}
-                            className="min-w-[78%] sm:min-w-[420px] md:min-w-[520px] snap-start"
+                            className="min-w-[82%] sm:min-w-[420px] md:min-w-[520px] snap-start"
                             initial={{ opacity: 0, y: 14 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, amount: 0.2 }}
@@ -673,7 +681,7 @@ export default function MainApp() {
             </section>
 
             <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto" id="menu">
-                <div className="rounded-3xl glass-strong glass-liquid p-6 md:p-10">
+                <div className="rounded-3xl glass-strong p-6 md:p-10">
                     <div className="flex items-end justify-between gap-6">
                         <div>
                             <div className="font-label-sm text-label-sm text-on-surface-variant">Menu</div>
@@ -699,98 +707,79 @@ export default function MainApp() {
                         </div>
                     </div>
 
-                    <div className="mt-10 grid lg:grid-cols-[280px_1fr] gap-6">
-                        <aside className="hidden lg:block">
-                            <div className="sticky top-[140px] rounded-3xl glass p-5">
-                                <div className="font-label-sm text-label-sm text-on-surface-variant mb-4">
-                                    Categories
-                                </div>
-                                <div className="space-y-2">
-                                    {categoriesForRender.map((c) => (
-                                        <button
-                                            key={c.id}
-                                            type="button"
-                                            onClick={() => document.getElementById(c.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                                            className={[
-                                                'w-full flex items-center justify-between gap-3 rounded-2xl px-4 py-3 border transition-colors',
-                                                activeCategory === c.id
-                                                    ? 'bg-primary text-on-primary border-primary'
-                                                    : 'glass-chip text-on-surface border-outline-variant/50 hover:bg-white/75',
-                                            ].join(' ')}
-                                        >
-                                            <span className="inline-flex items-center gap-3">
-                                                <span className="material-symbols-outlined text-[20px]">
-                                                    {categoryIcons[c.id] ?? 'menu_book'}
-                                                </span>
-                                                <span className="font-bold">{c.label}</span>
-                                            </span>
-                                            <span className="text-sm tabular-nums opacity-80">
-                                                {filterMenuItems(categoryById.get(c.id)?.items).length}
-                                            </span>
-                                        </button>
-                                    ))}
-                                </div>
-                                {normalizedQuery ? (
-                                    <div className="mt-5 text-sm text-on-surface-variant">
-                                        Searching for “{searchQuery}”
-                                    </div>
-                                ) : null}
-                            </div>
-                        </aside>
-
-                        <div className="space-y-10">
-                            {categoriesForRender.map((category) => {
-                                const items = filterMenuItems(categoryById.get(category.id)?.items);
-
-                                return (
-                                    <div key={category.id} id={category.id} className="rounded-3xl glass p-6 scroll-mt-28">
-                                        <Reveal>
-                                            <div className="flex items-center justify-between gap-6">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="material-symbols-outlined text-primary text-[26px]">
-                                                        {categoryIcons[category.id] ?? 'menu_book'}
-                                                    </span>
-                                                    <h3 className="font-headline-lg text-headline-lg text-on-surface">
-                                                        {category.label}
-                                                    </h3>
-                                                </div>
-                                                <span className="inline-flex items-center gap-2 rounded-full glass-chip px-4 py-2 text-on-surface-variant font-label-sm text-label-sm">
-                                                    <span className="material-symbols-outlined text-[18px] text-primary">
-                                                        menu_book
-                                                    </span>
-                                                    {items.length} items
-                                                </span>
-                                            </div>
-                                        </Reveal>
-
-                                        <div className="mt-6 grid md:grid-cols-2 gap-3">
-                                            {loading
-                                                ? Array.from({ length: 8 }).map((_, idx) => (
-                                                      <div
-                                                          key={`${category.id}-skeleton-${idx}`}
-                                                          className="h-[78px] rounded-2xl bg-surface-container-low animate-pulse"
-                                                      />
-                                                  ))
-                                                : items.map((item, idx) => (
-                                                      <Reveal key={item.id} delay={idx * 0.02}>
-                                                          <MenuRow item={item} />
-                                                      </Reveal>
-                                                  ))}
-                                        </div>
-
-                                        {!loading && normalizedQuery && items.length === 0 ? (
-                                            <div className="mt-4 text-sm text-on-surface-variant">
-                                                No results in {category.label} for “{searchQuery}”.
-                                            </div>
-                                        ) : null}
-                                    </div>
-                                );
-                            })}
-
-                            {error ? (
-                                <div className="text-sm text-on-surface-variant">Menu API not reachable. Check backend.</div>
-                            ) : null}
+                    <div className="mt-6 sticky top-[84px] z-20 -mx-2 px-2 py-2 rounded-3xl glass-nav border border-outline-variant/30">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                            {(categoriesForTabs.length ? categoriesForTabs : categoriesForRender).map((c) => (
+                                <button
+                                    key={c.id}
+                                    type="button"
+                                    onClick={() => setActiveCategory(c.id)}
+                                    className={[
+                                        'w-full px-3 py-3 rounded-2xl border font-label-sm text-[12px] leading-snug text-center whitespace-normal min-h-[48px] transition-colors',
+                                        activeCategory === c.id
+                                            ? 'bg-primary text-on-primary border-primary'
+                                            : 'glass-chip text-on-surface border-outline-variant/50 hover:bg-white/75',
+                                    ].join(' ')}
+                                >
+                                    {c.label}
+                                </button>
+                            ))}
                         </div>
+                    </div>
+
+                    <div id="menu-items" className="mt-8 rounded-3xl glass p-6">
+                        <Reveal>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                <div className="flex items-center gap-3">
+                                    <span className="material-symbols-outlined text-primary text-[26px]">
+                                        {activeCategoryData?.id ? categoryIcons[activeCategoryData.id] ?? 'menu_book' : 'menu_book'}
+                                    </span>
+                                    <h3 className="font-headline-lg text-headline-lg text-on-surface">
+                                        {activeCategoryData?.label ?? 'Menu'}
+                                    </h3>
+                                </div>
+                                <span className="inline-flex items-center gap-2 rounded-full glass-chip px-4 py-2 text-on-surface-variant font-label-sm text-label-sm w-fit">
+                                    <span className="material-symbols-outlined text-[18px] text-primary">menu_book</span>
+                                    {filterMenuItems(categoryById.get(activeCategoryData?.id)?.items).length} items
+                                </span>
+                            </div>
+                        </Reveal>
+
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={activeCategoryData?.id ?? 'menu'}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -8 }}
+                                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                                className="mt-6 grid md:grid-cols-2 gap-3"
+                            >
+                                {loading
+                                    ? Array.from({ length: 10 }).map((_, idx) => (
+                                          <div
+                                              key={`menu-skeleton-${idx}`}
+                                              className="h-[78px] rounded-2xl bg-surface-container-low animate-pulse"
+                                          />
+                                      ))
+                                    : filterMenuItems(categoryById.get(activeCategoryData?.id)?.items).map((item, idx) => (
+                                          <Reveal key={item.id} delay={idx * 0.02}>
+                                              <MenuRow item={item} />
+                                          </Reveal>
+                                      ))}
+                            </motion.div>
+                        </AnimatePresence>
+
+                        {!loading &&
+                        normalizedQuery &&
+                        filterMenuItems(categoryById.get(activeCategoryData?.id)?.items).length === 0 ? (
+                            <div className="mt-4 text-sm text-on-surface-variant">
+                                No results for “{searchQuery}”.
+                            </div>
+                        ) : null}
+
+                        {error ? (
+                            <div className="mt-4 text-sm text-on-surface-variant">Menu API not reachable. Check backend.</div>
+                        ) : null}
                     </div>
                 </div>
             </section>
@@ -1053,7 +1042,7 @@ export default function MainApp() {
             </footer>
             </main>
 
-            <nav className="fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-4 glass-nav border-t border-outline-variant/40 shadow-[0_-4px_18px_rgba(0,0,0,0.10)] md:hidden z-50 h-16">
+            <nav className="fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] px-4 border-t border-primary/20 shadow-[0_-10px_26px_rgba(0,0,0,0.16)] md:hidden z-50 h-16 bg-gradient-to-r from-[#f3e2cf]/95 via-[#fff8f3]/95 to-[#ead1ba]/95 backdrop-blur-md">
                 <a
                     className={[
                         'flex flex-col items-center justify-center font-bold transition-transform active:scale-95',
@@ -1091,24 +1080,6 @@ export default function MainApp() {
                     <span className="font-label-sm text-label-sm">Call</span>
                 </a>
             </nav>
-
-            <AnimatePresence>
-                {isScrolled ? (
-                    <motion.a
-                        href="#"
-                        className="fixed bottom-24 right-4 md:bottom-8 md:right-8 z-[65] inline-flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-on-primary shadow-lg border border-primary/30"
-                        initial={{ opacity: 0, y: 16, scale: 0.96 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 16, scale: 0.96 }}
-                        transition={{ type: 'spring', stiffness: 260, damping: 22 }}
-                        whileHover={{ y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                    >
-                        <span className="material-symbols-outlined text-[18px]">north</span>
-                        <span className="font-label-sm text-label-sm">Top</span>
-                    </motion.a>
-                ) : null}
-            </AnimatePresence>
         </div>
     );
 }
