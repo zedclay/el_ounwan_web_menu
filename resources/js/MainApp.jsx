@@ -597,15 +597,9 @@ export default function MainApp() {
             <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto" id="highlights">
                 <div className="px-2 md:px-0">
                     <Reveal>
-                        <div className="flex items-end justify-between gap-6">
-                            <div>
-                                <div className="font-label-sm text-label-sm text-on-surface-variant">Featured</div>
-                                <h2 className="font-headline-lg text-headline-lg text-on-surface">Moments at el ounwan</h2>
-                            </div>
-                            <div className="hidden md:flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm">
-                                <span className="material-symbols-outlined text-[18px]">swipe</span>
-                                Swipe
-                            </div>
+                        <div className="text-center">
+                            <div className="font-label-sm text-label-sm text-on-surface-variant">Featured</div>
+                            <h2 className="font-headline-lg text-headline-lg text-on-surface">Moments at el ounwan</h2>
                         </div>
                     </Reveal>
                 </div>
@@ -639,44 +633,6 @@ export default function MainApp() {
                             </Tilt>
                         </motion.div>
                     ))}
-                </div>
-            </section>
-
-            <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto" id="atmosphere">
-                <div className="rounded-3xl bg-surface-container-lowest border border-outline-variant/40 p-6 md:p-10 shadow-sm">
-                    <div className="grid md:grid-cols-2 gap-10 items-center">
-                        <Reveal>
-                            <div className="space-y-6" dir="rtl">
-                                <div className="inline-flex items-center gap-3 rounded-full bg-surface-container-low border border-outline-variant/40 px-4 py-2">
-                                    <span className="material-symbols-outlined text-[18px] text-primary">auto_stories</span>
-                                    <span className="font-label-sm text-label-sm text-on-surface-variant">Our Story</span>
-                                </div>
-                                <h2 className="font-headline-lg text-headline-lg text-on-surface">أجواءنا • Our Atmosphere</h2>
-                                <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
-                                    Between the warmth of terracotta and the scent of freshly roasted beans, we've
-                                    crafted a sanctuary for slow moments. Every bite and every pour is a tribute to the
-                                    artisanal heritage of Algiers.
-                                </p>
-                                <div className="flex gap-4">
-                                    <div className="w-16 h-1 bg-primary rounded-full" />
-                                    <div className="w-8 h-1 bg-tertiary-container rounded-full" />
-                                </div>
-                            </div>
-                        </Reveal>
-                        <Reveal delay={0.05}>
-                            <Tilt className="rounded-3xl overflow-hidden" tilt={8} perspective={1000} glareSize={560}>
-                                <div className="relative">
-                                    <div className="absolute -inset-2 bg-primary/10 rounded-3xl rotate-1" />
-                                    <img
-                                        className="relative w-full h-[360px] md:h-[420px] object-cover rounded-3xl shadow-xl border border-outline-variant/40"
-                                        src="assets/images/ui/atmosphere.jpg"
-                                        alt="Our atmosphere"
-                                        loading="lazy"
-                                    />
-                                </div>
-                            </Tilt>
-                        </Reveal>
-                    </div>
                 </div>
             </section>
 
@@ -784,7 +740,45 @@ export default function MainApp() {
                 </div>
             </section>
 
-            <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto" id="story">
+            <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto md:!mt-8" id="atmosphere">
+                <div className="rounded-3xl bg-surface-container-lowest border border-outline-variant/40 p-6 md:p-10 shadow-sm">
+                    <div className="grid md:grid-cols-2 gap-10 items-center">
+                        <Reveal>
+                            <div className="space-y-6" dir="rtl">
+                                <div className="inline-flex items-center gap-3 rounded-full bg-surface-container-low border border-outline-variant/40 px-4 py-2">
+                                    <span className="material-symbols-outlined text-[18px] text-primary">auto_stories</span>
+                                    <span className="font-label-sm text-label-sm text-on-surface-variant">Our Story</span>
+                                </div>
+                                <h2 className="font-headline-lg text-headline-lg text-on-surface">أجواءنا • Our Atmosphere</h2>
+                                <p className="font-body-lg text-body-lg text-on-surface-variant leading-relaxed">
+                                    Between the warmth of terracotta and the scent of freshly roasted beans, we've
+                                    crafted a sanctuary for slow moments. Every bite and every pour is a tribute to the
+                                    artisanal heritage of Algiers.
+                                </p>
+                                <div className="flex gap-4">
+                                    <div className="w-16 h-1 bg-primary rounded-full" />
+                                    <div className="w-8 h-1 bg-tertiary-container rounded-full" />
+                                </div>
+                            </div>
+                        </Reveal>
+                        <Reveal delay={0.05}>
+                            <Tilt className="rounded-3xl overflow-hidden" tilt={8} perspective={1000} glareSize={560}>
+                                <div className="relative">
+                                    <div className="absolute -inset-2 bg-primary/10 rounded-3xl rotate-1" />
+                                    <img
+                                        className="relative w-full h-[360px] md:h-[420px] object-cover rounded-3xl shadow-xl border border-outline-variant/40"
+                                        src="assets/images/ui/atmosphere.jpg"
+                                        alt="Our atmosphere"
+                                        loading="lazy"
+                                    />
+                                </div>
+                            </Tilt>
+                        </Reveal>
+                    </div>
+                </div>
+            </section>
+
+            <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto md:!mt-8" id="story">
                 <div className="rounded-3xl glass-strong glass-liquid p-6 md:p-10">
                     <Reveal>
                         <div className="flex items-end justify-between gap-6">
