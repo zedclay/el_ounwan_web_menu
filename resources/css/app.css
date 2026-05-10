@@ -1,0 +1,223 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.{js,jsx,ts,tsx}';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.organic-wave {
+    clip-path: ellipse(100% 100% at 50% 100%);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff8f3;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(148, 51, 6, 0.22);
+    border-radius: 10px;
+}
+
+body {
+    background:
+        radial-gradient(900px 720px at 10% -8%, rgba(255, 210, 193, 0.651), transparent 58%),
+        radial-gradient(860px 640px at 95% 8%, rgba(249, 220, 166, 0.45), transparent 56%),
+        radial-gradient(860px 640px at 82% 110%, rgba(181, 74, 31, 0.20), transparent 62%),
+        radial-gradient(760px 560px at 18% 95%, rgba(113, 91, 48, 0.16), transparent 62%),
+        linear-gradient(180deg, #fff8f3 0%, #fff3e6 45%, #fff8f3 100%);
+    color: #231a0a;
+    scroll-behavior: smooth;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(520px 420px at 18% 20%, rgba(148, 51, 6, 0.05), transparent 65%),
+        radial-gradient(620px 520px at 82% 30%, rgba(148, 51, 6, 0.04), transparent 65%),
+        radial-gradient(760px 560px at 50% 88%, rgba(148, 51, 6, 0.03), transparent 65%),
+        repeating-linear-gradient(
+            0deg,
+            rgba(35, 26, 10, 0.02) 0px,
+            rgba(35, 26, 10, 0.02) 1px,
+            transparent 1px,
+            transparent 7px
+        );
+    opacity: 1;
+    mix-blend-mode: multiply;
+}
+
+.glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34));
+    border: 1px solid rgba(222, 192, 182, 0.65);
+    box-shadow:
+        0 22px 60px rgba(35, 26, 10, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(18px) saturate(150%);
+    -webkit-backdrop-filter: blur(18px) saturate(150%);
+}
+
+.glass-strong {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.40));
+    border: 1px solid rgba(222, 192, 182, 0.75);
+    box-shadow:
+        0 26px 72px rgba(35, 26, 10, 0.10),
+        inset 0 1px 0 rgba(255, 255, 255, 0.60);
+    backdrop-filter: blur(22px) saturate(165%);
+    -webkit-backdrop-filter: blur(22px) saturate(165%);
+}
+
+.glass-chip {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(222, 192, 182, 0.60);
+    box-shadow:
+        0 14px 36px rgba(35, 26, 10, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+
+.glass-nav {
+    background: rgba(255, 255, 255, 0.55);
+    border-bottom: 1px solid rgba(222, 192, 182, 0.55);
+    box-shadow:
+        0 10px 26px rgba(35, 26, 10, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(20px) saturate(170%);
+    -webkit-backdrop-filter: blur(20px) saturate(170%);
+}
+
+.glass-liquid {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.glass-liquid::before {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background:
+        radial-gradient(440px 320px at 24% 18%, rgba(255, 255, 255, 0.55), transparent 62%),
+        radial-gradient(520px 420px at 78% 30%, rgba(255, 255, 255, 0.38), transparent 65%),
+        radial-gradient(520px 420px at 60% 85%, rgba(255, 255, 255, 0.22), transparent 70%);
+    transform: translate3d(-4%, -2%, 0) rotate(-6deg);
+    opacity: 0.9;
+    mix-blend-mode: screen;
+    pointer-events: none;
+    z-index: -1;
+    animation: liquid-sheen 9.5s ease-in-out infinite;
+}
+
+.glass-liquid::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(148, 51, 6, 0.07), transparent 45%),
+        linear-gradient(315deg, rgba(249, 220, 166, 0.10), transparent 50%);
+    opacity: 0.85;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes liquid-sheen {
+    0% {
+        transform: translate3d(-6%, -3%, 0) rotate(-6deg);
+    }
+    50% {
+        transform: translate3d(6%, 3%, 0) rotate(4deg);
+    }
+    100% {
+        transform: translate3d(-6%, -3%, 0) rotate(-6deg);
+    }
+}
+
+::selection {
+    background: rgba(148, 51, 6, 0.18);
+}
+
+:focus-visible {
+    outline: 3px solid rgba(148, 51, 6, 0.35);
+    outline-offset: 3px;
+}
+
+@keyframes fade-in-up {
+    0% {
+        opacity: 0;
+        transform: translate3d(0, 18px, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes float-slow {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+    50% {
+        transform: translate3d(0, -10px, 0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 0% 50%;
+    }
+    100% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in-up 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-float {
+    animation: float-slow 5s ease-in-out infinite;
+}
+
+.bg-shimmer {
+    background-size: 200% 200%;
+    animation: shimmer 10s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        scroll-behavior: auto;
+    }
+    .animate-fade-in,
+    .animate-float,
+    .bg-shimmer {
+        animation: none;
+    }
+}

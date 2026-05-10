@@ -1,0 +1,102 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: laravel-app/package-lock.json
+
+      - name: Install
+        working-directory: laravel-app
+        run: npm ci
+
+      - name: Build assets
+        working-directory: laravel-app
+        run: npm run build
+
+      - name: Prepare static site
+        working-directory: laravel-app
+        run: |
+          mkdir -p _site
+          cp -R public/build _site/build
+          cp -R public/assets _site/assets
+          cp public/menu.json _site/menu.json
+          if [ -f public/favicon.ico ]; then cp public/favicon.ico _site/favicon.ico; fi
+          if [ -f public/robots.txt ]; then cp public/robots.txt _site/robots.txt; fi
+
+          node - <<'NODE'
+          import fs from 'node:fs';
+          import path from 'node:path';
+
+          const manifestPath = path.join(process.cwd(), 'public', 'build', 'manifest.json');
+          const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
+          const cssEntry = manifest['resources/css/app.css']?.file;
+          const jsEntry = manifest['resources/js/app.jsx']?.file;
+
+          if (!cssEntry || !jsEntry) {
+            console.error('Missing build entries in manifest.json');
+            process.exit(1);
+          }
+
+          const html = `<!DOCTYPE html>
+          <html lang="ar" dir="rtl">
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>العنوان • el ounwan | Coffee shop • Eatery</title>
+              <link rel="preconnect" href="https://fonts.googleapis.com" />
+              <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+              <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Be+Vietnam+Pro:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+              <link rel="stylesheet" href="./build/${cssEntry}" />
+            </head>
+            <body>
+              <div id="root"></div>
+              <script type="module" src="./build/${jsEntry}"></script>
+            </body>
+          </html>`;
+
+          fs.writeFileSync(path.join(process.cwd(), '_site', 'index.html'), html);
+          NODE
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: laravel-app/_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
+
