@@ -5,6 +5,9 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 permissions:
   contents: read
   pages: write
@@ -24,20 +27,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           cache: "npm"
-          cache-dependency-path: laravel-app/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install
-        working-directory: laravel-app
         run: npm ci
 
       - name: Build assets
-        working-directory: laravel-app
         run: npm run build
 
       - name: Prepare static site
-        working-directory: laravel-app
         run: |
           mkdir -p _site
           cp -R public/build _site/build
@@ -87,7 +87,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: laravel-app/_site
+          path: _site
 
   deploy:
     needs: build
@@ -99,4 +99,3 @@ jobs:
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
-
