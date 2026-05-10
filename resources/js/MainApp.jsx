@@ -265,13 +265,15 @@ function PillLink({ href, active, children, onClick }) {
     );
 }
 
-function MenuRow({ item }) {
+function MenuRow({ item, onSelect }) {
     return (
         <Tilt className="rounded-2xl">
-            <motion.div
+            <motion.button
+                type="button"
                 whileHover={{ y: -2 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 32 }}
-                className="flex items-start sm:items-center gap-3 sm:gap-4 p-4 rounded-2xl glass-chip glass-liquid transition-all group"
+                onClick={onSelect}
+                className="w-full text-start flex items-start sm:items-center gap-3 sm:gap-4 p-4 rounded-2xl glass-chip glass-liquid transition-all group cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
             >
                 {item.imageUrl ? (
                     <SmartImage
@@ -302,8 +304,103 @@ function MenuRow({ item }) {
                         </div>
                     </div>
                 </div>
-            </motion.div>
+            </motion.button>
         </Tilt>
+    );
+}
+
+function MenuItemModal({ open, item, categoryLabel, onClose }) {
+    return (
+        <AnimatePresence>
+            {open && item ? (
+                <>
+                    <motion.button
+                        type="button"
+                        aria-label="Close"
+                        className="fixed inset-0 z-[80] bg-black/35 backdrop-blur-[2px]"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.18 }}
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        className="fixed z-[81] inset-x-0 bottom-0 md:inset-0 md:flex md:items-center md:justify-center"
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 16 }}
+                        transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        <div className="w-full md:max-w-2xl md:px-6">
+                            <div className="relative rounded-t-3xl md:rounded-3xl glass-strong glass-liquid border border-outline-variant/40 p-5 md:p-8 shadow-2xl">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="absolute left-4 top-4 md:left-5 md:top-5 h-10 w-10 rounded-full glass-chip border border-outline-variant/40 flex items-center justify-center text-on-surface-variant hover:bg-white/80 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
+                                    aria-label="Close"
+                                >
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+
+                                <div className="grid md:grid-cols-[1.05fr_0.95fr] gap-6 items-start">
+                                    <div className="rounded-2xl overflow-hidden border border-outline-variant/40 bg-surface-container-lowest">
+                                        {item.imageUrl ? (
+                                            <SmartImage
+                                                className="w-full h-56 md:h-72 object-cover"
+                                                src={item.imageUrl}
+                                                alt={item.name}
+                                                width={1400}
+                                                height={900}
+                                            />
+                                        ) : (
+                                            <div className="w-full h-56 md:h-72 flex items-center justify-center bg-surface-container-low">
+                                                <span className="material-symbols-outlined text-primary text-[44px]">
+                                                    menu_book
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="min-w-0">
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="min-w-0">
+                                                <div className="font-label-sm text-label-sm text-on-surface-variant">
+                                                    {categoryLabel || 'Menu'}
+                                                </div>
+                                                <h3 className="mt-1 font-headline-lg text-headline-lg text-on-surface break-words">
+                                                    {item.name}
+                                                </h3>
+                                            </div>
+                                            <span className="shrink-0 inline-flex items-center rounded-full bg-primary text-on-primary px-4 py-2 font-bold tabular-nums">
+                                                {item.price}
+                                            </span>
+                                        </div>
+
+                                        {item.description ? (
+                                            <div className="mt-4 text-on-surface-variant leading-relaxed">{item.description}</div>
+                                        ) : (
+                                            <div className="mt-4 text-on-surface-variant leading-relaxed">—</div>
+                                        )}
+
+                                        <div className="mt-6 flex gap-3">
+                                            <button
+                                                type="button"
+                                                onClick={onClose}
+                                                className="flex-1 rounded-2xl glass-chip border border-outline-variant/40 px-4 py-3 text-on-surface font-bold hover:bg-white/80 transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15"
+                                            >
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </>
+            ) : null}
+        </AnimatePresence>
     );
 }
 
@@ -386,6 +483,8 @@ export default function MainApp() {
     const [activeSection, setActiveSection] = useState('menu');
     const [activeCategory, setActiveCategory] = useState('coffee');
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedMenuItem, setSelectedMenuItem] = useState(null);
+    const [selectedMenuCategoryLabel, setSelectedMenuCategoryLabel] = useState(null);
     const reduceMotion = useReducedMotion();
     const { scrollY, scrollYProgress } = useScroll();
     const heroBgY = useTransform(scrollY, [0, 900], [0, 70]);
@@ -428,6 +527,23 @@ export default function MainApp() {
         if (!ids.length) return;
         if (!ids.includes(activeCategory)) setActiveCategory(ids[0]);
     }, [activeCategory, menu]);
+
+    useEffect(() => {
+        if (!selectedMenuItem) return;
+
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+
+        function onKeyDown(e) {
+            if (e.key === 'Escape') setSelectedMenuItem(null);
+        }
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            window.removeEventListener('keydown', onKeyDown);
+        };
+    }, [selectedMenuItem]);
 
     const categories = useMemo(() => {
         return menu?.categories ?? [];
@@ -719,7 +835,13 @@ export default function MainApp() {
                                       ))
                                     : filterMenuItems(categoryById.get(activeCategoryData?.id)?.items).map((item, idx) => (
                                           <Reveal key={item.id} delay={idx * 0.02}>
-                                              <MenuRow item={item} />
+                                              <MenuRow
+                                                  item={item}
+                                                  onSelect={() => {
+                                                      setSelectedMenuItem(item);
+                                                      setSelectedMenuCategoryLabel(activeCategoryData?.label ?? 'Menu');
+                                                  }}
+                                              />
                                           </Reveal>
                                       ))}
                             </motion.div>
@@ -739,6 +861,13 @@ export default function MainApp() {
                     </div>
                 </div>
             </section>
+
+            <MenuItemModal
+                open={Boolean(selectedMenuItem)}
+                item={selectedMenuItem}
+                categoryLabel={selectedMenuCategoryLabel}
+                onClose={() => setSelectedMenuItem(null)}
+            />
 
             <section className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto md:!mt-8" id="atmosphere">
                 <div className="rounded-3xl bg-surface-container-lowest border border-outline-variant/40 p-6 md:p-10 shadow-sm">
