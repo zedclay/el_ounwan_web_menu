@@ -9,7 +9,7 @@
 
 ## Proposal (PDF)
 
-[Open the proposal](./public/ounwan_digital_menu_proposal.pdf)
+[![Proposal preview](./public/assets/proposal/proposal-preview.png)](./public/ounwan_digital_menu_proposal.pdf)
 
 ## About Laravel
 
